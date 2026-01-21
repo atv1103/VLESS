@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # Контейнер для генерации конфигурации (запускается один раз)
+  config-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile.config
+    container_name: xray-config-builder
+    volumes:
+      - ./configs:/app/configs
+      - ./settings.env:/app/settings.env
+      - ./config.json:/app/config.json
+    command: /bin/bash -c "./install-config.sh"
+    profiles:
+      - setup  # Запускается только при явном указании
+  # docker compose --profile setup run --rm config-builder && docker compose --profile setup down --rmi local
+
+  # Основной контейнер Xray
+  xray:
+    build:
+      context: .
+      dockerfile: Dockerfile.xray
+    container_name: xray
+    restart: unless-stopped
+    network_mode: host  # Для доступа ко всем портам
+    volumes:
+      - ./:/etc/xray
+    cap_add:
+      - NET_ADMIN
+
+  # Wireguard клиент
+  wireguard:
+    image: linuxserver/wireguard
+    container_name: wg-client
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Moscow
+    volumes:
+      - ./wg/config:/config
+      - /lib/modules:/lib/modules
+    restart: unless-stopped
+
+volumes:
+  configs:
+    driver: local
+  logs:
+    driver: local
+
