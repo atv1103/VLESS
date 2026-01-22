@@ -5,6 +5,7 @@
 4. `docker compose up -d` - запускаем контейнеры с VLESS и WG
 5. `cp ./examples/wg0.conf ./wg/config/wg0.conf`
 6. Изменяем настройки файла **./wg/config/wg0.conf**
+7. `docker compose --profile vpn up -d` - запускаем wireguard
 
 Готово, конфиги наших клиентов хранятся в директории **/configs/*прокси-протокол*/userНОМЕР/**, можем скопировать файл конфигурации клиента **userНОМЕР.txt** с сервера с помощью WinSCP или другим удобным для вас способом или вывести QR код прямо в терминале командой `docker exec -it xray /etc/xray/show-reality userНОМЕР`
 `docker exec -it xray /etc/xray/show-ss userНОМЕР` - **DEPRECATED!**
