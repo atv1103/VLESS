@@ -1,13 +1,13 @@
 ## Инструкция для запуска
 1. Изменяем настройки файла **settings.env**, удали блокировку торрентов при необходимости из config.json (инструкция ниже)
 2. `bash prepare-system.sh` - доп настройки сервера
-3. `docker compose --profile setup run --rm config-builder && docker compose --profile setup down --rmi local` - создаем пользовательские конфиги
-4. `docker compose up -d` - запускаем контейнер с VLESS
-5. `cp ./examples/wg0.conf ./wg/config/wg0.conf`
-6. Изменяем настройки файла **./wg/config/wg0.conf**
-7. `docker compose --profile vpn up -d` - запускаем wireguard
+3. ```docker compose --profile setup run --rm config-builder && \
+docker compose --profile setup run --rm wg-config-builder && \
+docker compose --profile setup down --rmi local``` - создаем пользовательские конфиги VLESS и клиентский конфиг Wireguard
+1. `nano ./VLESS/wg/config/wg0.conf` - редактируем конфиг Wireguard
+2. `docker compose up -d` - запускаем контейнер с VLESS и WG
 
-Готово, конфиги наших клиентов хранятся в директории **/configs/*прокси-протокол*/userНОМЕР/**, можем скопировать файл конфигурации клиента **userНОМЕР.txt** с сервера с помощью WinSCP или другим удобным для вас способом или вывести QR код прямо в терминале командой 
+Готово, конфиги наших клиентов хранятся в директории **/configs/*прокси-протокол*/userНОМЕР/**, можем скопировать файл конфигурации клиента **userНОМЕР.txt** с сервера с помощью WinSCP или другим удобным для вас способом или вывести QR код прямо в терминале командой
 `docker exec -it xray /etc/xray/show-reality userНОМЕР`
 `docker exec -it xray /etc/xray/show-ss userНОМЕР` - **DEPRECATED!**
 `docker exec -it xray /etc/xray/show-xhttp userНОМЕР`
@@ -67,6 +67,7 @@ net.ipv4.tcp_congestion_control=bbr
 4. docker-check.sh - проверка наличия докера и установка в случае отсутствия
 5. ssh-user-create.sh - создание нового ssh пользователя с ограниченными правами, открытие туннелирования
 6. update-speed.sh - настройка Bottleneck Bandwidth и Round-trip propagation time (BBR) congestion control algorithm
+7. wg-generate.sh - генерация клиентского конфига wireguard
 
 # Клиенты
 Windows / Linux - v2rayN, Nekobox/Nekoray, Hiddify‑Next, InvisibleMan

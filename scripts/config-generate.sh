@@ -168,7 +168,7 @@ generate_shadowsocks_configs() {
         {\"password\": \"$client_password\", \"email\": \"$email\"}"
         fi
 
-        local full_password="${SS_SERVER_PASSWORD}:${client_password}"
+        local full_password="${SERVER_PASSWORD}:${client_password}"
 
         local ss_link="ss://${SS_METHOD}:${full_password}@${SERVER_IP}:${SS_PORT}#SS2022_${email}"
 
@@ -206,15 +206,15 @@ generate_xhttp_configs() {
         # Добавляем в JSON
         if [ "$first" = true ]; then
             xhttp_clients_json+="
-        {\"id\": \"$uuid\", \"email\": \"$email\", \"flow\": \"xtls-rprx-vision\"}"
+        {\"id\": \"$uuid\", \"email\": \"$email\"}"
             first=false
         else
             xhttp_clients_json+=",
-        {\"id\": \"$uuid\", \"email\": \"$email\", \"flow\": \"xtls-rprx-vision\"}"
+        {\"id\": \"$uuid\", \"email\": \"$email\"}"
         fi
 
         # Генерация vless:// ссылки для xhttp
-        local xhttp_link="vless://${uuid}@${SERVER_IP}:${xhttp_PORT:-443}?type=xhttp&security=none&flow=xtls-rprx-vision&path=${xhttp_PATH}&host=${xhttp_HOST}#xhttp_${email}"
+        local xhttp_link="vless://${uuid}@${SERVER_IP}:${xhttp_PORT:-443}?type=xhttp&encryption=none&security=none&path=${xhttp_PATH}&host=${xhttp_HOST}#xhttp_${email}"
 
         # Сохранение
         mkdir -p configs/xhttp/${email}

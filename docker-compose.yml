@@ -29,6 +29,18 @@ services:
     cap_add:
       - NET_ADMIN
 
+  # Контейнер для генерации конфигурации (запускается один раз)
+  wg-config-builder:
+    image: linuxserver/wireguard
+    container_name: wg-config-builder
+    volumes:
+      - ./wg/config:/config
+      - ./scripts/wg-generate.sh:/wg-generate.sh:ro
+    entrypoint: /bin/bash
+    command: /wg-generate.sh
+    profiles:
+      - setup
+
   # Wireguard клиент
   wireguard:
     image: linuxserver/wireguard
@@ -44,8 +56,6 @@ services:
       - ./wg/config:/config
       - /lib/modules:/lib/modules
     restart: unless-stopped
-    profiles:
-      - vpn  # Запускается только при явном указании
 
 volumes:
   configs:
