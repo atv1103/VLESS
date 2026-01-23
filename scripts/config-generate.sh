@@ -170,7 +170,8 @@ generate_shadowsocks_configs() {
 
         local full_password="${SERVER_PASSWORD}:${client_password}"
 
-        local ss_link="ss://${SS_METHOD}:${full_password}@${SERVER_IP}:${SS_PORT}#SS2022_${email}"
+        local bodylink=$(echo -n "${SS_METHOD}:${full_password}@${SERVER_IP}:${SS_PORT}" | base64 -w0)
+        local ss_link="ss://${bodylink}#SS2022_${email}"
 
         mkdir -p configs/shadowsocks2022/${email}
         echo "$ss_link" > "configs/shadowsocks2022/${email}/${email}.txt"
