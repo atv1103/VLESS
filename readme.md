@@ -16,7 +16,7 @@ docker compose --profile setup down --rmi local`
 
 `docker exec -it xray /etc/xray/show-ss userНОМЕР` - **DEPRECATED!**
 
-`docker exec -it xray /etc/xray/show-xhttp userНОМЕР`
+`docker exec -it xray /etc/xray/show-splithttp userНОМЕР`
 
 `docker exec -it xray /etc/xray/show-grpc userНОМЕР`
 
@@ -70,11 +70,11 @@ net.ipv4.tcp_congestion_control=bbr
 
 **SS_SERVER_PASSWORD** - произвольный ключ shadowsocks, будет сгенерирован автоматически
 
-**xhttp_PORT** - необходимо изменить номер порта на нестандартный
+**SPLITHTTP_PORT** - необходимо изменить номер порта на нестандартный
 
-**xhttp_HOST** - доменное имя, которое будет использоваться в HTTP заголовке host
+**SPLITHTTP_HOST** - доменное имя, которое будет использоваться в HTTP заголовке host
 
-**xhttp_PATH** - URI путь для соединения
+**SPLITHTTP_PATH** - URI путь для соединения
 
 **GRPC_PORT** - рекомендовано 2053
 

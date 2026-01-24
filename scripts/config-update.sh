@@ -9,7 +9,7 @@ source "$SCRIPT_DIR/_logger.sh"
 # Пути к файлам
 CONFIG_FILE="$ROOT_DIR/config.json"
 REALITY_CLIENTS_FILE="$ROOT_DIR/configs/reality_clients.json"
-xhttp_CLIENTS_FILE="$ROOT_DIR/configs/xhttp_clients.json"
+SPLITHTTP_CLIENTS_FILE="$ROOT_DIR/configs/splithttp_clients.json"
 GRPC_CLIENTS_FILE="$ROOT_DIR/configs/grpc_clients.json"
 SS_CLIENTS_FILE="$ROOT_DIR/configs/shadowsocks_clients.json"
 SETTINGS_FILE="$ROOT_DIR/settings.env"
@@ -42,9 +42,9 @@ validate_settings() {
         "SS_PORT"
         "SS_METHOD"
         "SS_SERVER_PASSWORD"
-        "xhttp_PORT"
-        "xhttp_HOST"
-        "xhttp_PATH"
+        "SPLITHTTP_PORT"
+        "SPLITHTTP_HOST"
+        "SPLITHTTP_PATH"
         "GRPC_PORT"
         "GRPC_SERVICENAME"
     )
@@ -67,12 +67,12 @@ log_info "Backup created: $BACKUP_FILE"
 # Читаем массивы клиентов
 log_info "Reading client data..."
 REALITY_CLIENTS=$(cat "$REALITY_CLIENTS_FILE")
-xhttp_CLIENTS=$(cat "$xhttp_CLIENTS_FILE" 2>/dev/null || echo "[]")
+SPLITHTTP_CLIENTS=$(cat "$SPLITHTTP_CLIENTS_FILE" 2>/dev/null || echo "[]")
 GRPC_CLIENTS=$(cat "$GRPC_CLIENTS_FILE" 2>/dev/null || echo "[]")
 SS_CLIENTS=$(cat "$SS_CLIENTS_FILE" 2>/dev/null || echo "[]")
 
 log_info "Reality clients: $(echo "$REALITY_CLIENTS" | jq 'length') users"
-log_info "xhttp clients: $(echo "$xhttp_CLIENTS" | jq 'length') users"
+log_info "SplitHTTP clients: $(echo "$SPLITHTTP_CLIENTS" | jq 'length') users"
 log_info "grpc clients: $(echo "$GRPC_CLIENTS" | jq 'length') users"
 log_info "Shadowsocks clients: $(echo "$SS_CLIENTS" | jq 'length') users"
 
@@ -80,7 +80,7 @@ log_info "Shadowsocks clients: $(echo "$SS_CLIENTS" | jq 'length') users"
 log_info "Updating config.json..."
 
 jq --argjson reality_clients "$REALITY_CLIENTS" \
-    --argjson xhttp_clients "$xhttp_CLIENTS" \
+    --argjson splithttp_clients "$SPLITHTTP_CLIENTS" \
     --argjson grpc_clients "$GRPC_CLIENTS" \
     --argjson ss_clients "$SS_CLIENTS" \
     --arg reality_port "$REALITY_PORT" \
@@ -92,9 +92,9 @@ jq --argjson reality_clients "$REALITY_CLIENTS" \
     --arg ss_port "$SS_PORT" \
     --arg ss_method "$SS_METHOD" \
     --arg ss_password "$SS_SERVER_PASSWORD" \
-    --arg xhttp_port "$xhttp_PORT" \
-    --arg xhttp_host "$xhttp_HOST" \
-    --arg xhttp_path "$xhttp_PATH" \
+    --arg splithttp_port "$SPLITHTTP_PORT" \
+    --arg splithttp_host "$SPLITHTTP_HOST" \
+    --arg splithttp_path "$SPLITHTTP_PATH" \
     --arg grpc_port "$GRPC_PORT" \
     --arg grpc_serviceName "$GRPC_SERVICENAME" \
     '
@@ -107,13 +107,13 @@ jq --argjson reality_clients "$REALITY_CLIENTS" \
     (.inbounds[] | select(.tag == "reality-in") | .streamSettings.realitySettings.privateKey) = $reality_private_key |
     (.inbounds[] | select(.tag == "reality-in") | .streamSettings.realitySettings.shortIds) = $reality_short_ids |
 
-    # Обновляем xhttp clients
-    (.inbounds[] | select(.tag == "xhttp-h3-in") | .settings.clients) = $xhttp_clients |
+    # Обновляем SplitHTTP clients
+    (.inbounds[] | select(.tag == "splithttp-in") | .settings.clients) = $splithttp_clients |
 
-    # Обновляем xhttp настройки (тот же публичный ключ что и для Reality)
-    (.inbounds[] | select(.tag == "xhttp-h3-in") | .port) = ($xhttp_port | tonumber) |
-    (.inbounds[] | select(.tag == "xhttp-h3-in") | .streamSettings.xhttpSettings.host) = $xhttp_host |
-    (.inbounds[] | select(.tag == "xhttp-h3-in") | .streamSettings.xhttpSettings.path) = $xhttp_path |
+    # Обновляем SplitHTTP настройки (тот же публичный ключ что и для Reality)
+    (.inbounds[] | select(.tag == "splithttp-in") | .port) = ($splithttp_port | tonumber) |
+    (.inbounds[] | select(.tag == "splithttp-in") | .streamSettings.splithttpSettings.host) = $splithttp_host |
+    (.inbounds[] | select(.tag == "splithttp-in") | .streamSettings.splithttpSettings.path) = $splithttp_path |
 
     # Обновляем grpc clients
     (.inbounds[] | select(.tag == "grpc-in") | .settings.clients) = $xhttp_clients |
@@ -151,8 +151,8 @@ echo "Reality clients:"
 jq '.inbounds[] | select(.tag == "reality-in") | .settings.clients | length' "$CONFIG_FILE"
 
 echo ""
-echo "xhttp clients:"
-jq '.inbounds[] | select(.tag == "xhttp-h3-in") | .settings.clients | length' "$CONFIG_FILE"
+echo "SplitHTTP clients:"
+jq '.inbounds[] | select(.tag == "splithttp-in") | .settings.clients | length' "$CONFIG_FILE"
 
 echo ""
 echo "grpc clients:"

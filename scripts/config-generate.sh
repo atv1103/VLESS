@@ -178,8 +178,8 @@ generate_shadowsocks_configs() {
     echo "$ss_clients_json" > configs/shadowsocks_clients.json
 }
 
-generate_xhttp_configs() {
-    log_info "Generating xhttp configurations..."
+generate_splithttp_configs() {
+    log_info "Generating splithttp configurations..."
 
     local clients_data_file="configs/reality_clients.json"
 
@@ -188,7 +188,7 @@ generate_xhttp_configs() {
         return 1
     fi
 
-    local xhttp_clients_json="["
+    local splithttp_clients_json="["
     local first=true
 
     while IFS= read -r line; do
@@ -198,32 +198,32 @@ generate_xhttp_configs() {
 
         # Добавляем в JSON
         if [ "$first" = true ]; then
-            xhttp_clients_json+="
+            splithttp_clients_json+="
         {\"id\": \"$uuid\", \"email\": \"$email\"}"
             first=false
         else
-            xhttp_clients_json+=",
+            splithttp_clients_json+=",
         {\"id\": \"$uuid\", \"email\": \"$email\"}"
         fi
 
-        # Генерация vless:// ссылки для xhttp
-        local xhttp_link="vless://${uuid}@${SERVER_IP}:${xhttp_PORT:-443}?type=xhttp&encryption=none&security=none&path=${xhttp_PATH}&host=${xhttp_HOST}#xhttp_${email}"
+        # Генерация vless:// ссылки для splithttp
+        local splithttp_link="vless://${uuid}@${SERVER_IP}:${SPLITHTTP_PORT:-443}?type=splithttp&encryption=none&security=none&path=${SPLITHTTP_PATH}&host=${SPLITHTTP_HOST}#SplitHTTP_${email}"
 
         # Сохранение
-        mkdir -p configs/xhttp/${email}
-        echo "$xhttp_link" > "configs/xhttp/${email}/${email}.txt"
-        qrencode -t PNG -o "configs/xhttp/${email}/${email}.png" -s 10 "$xhttp_link"
+        mkdir -p configs/splithttp/${email}
+        echo "$splithttp_link" > "configs/splithttp/${email}/${email}.txt"
+        qrencode -t PNG -o "configs/splithttp/${email}/${email}.png" -s 10 "$splithttp_link"
 
-        log_info "Generated xhttp config for $email"
+        log_info "Generated splithttp config for $email"
 
     done < <(jq -c '.[]' "$clients_data_file")
 
-    xhttp_clients_json+="
+    splithttp_clients_json+="
     ]"
 
-    echo "$xhttp_clients_json" > configs/xhttp_clients.json
+    echo "$splithttp_clients_json" > configs/splithttp_clients.json
 
-    log_info "xhttp configurations generated"
+    log_info "splithttp configurations generated"
 }
 
 generate_grpc_configs() {
@@ -281,7 +281,7 @@ main() {
     create_directories
     generate_reality_configs
     generate_shadowsocks_configs
-    generate_xhttp_configs
+    generate_splithttp_configs
     generate_grpc_configs
 
     log_info "Configuration generation completed!"

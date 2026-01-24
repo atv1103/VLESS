@@ -62,7 +62,7 @@
     {
       "port": 0,
       "protocol": "vless",
-      "tag": "xhttp-h3-in",
+      "tag": "splithttp-in",
       "settings": {
         "clients": [
           {
@@ -73,9 +73,8 @@
         "decryption": "none"
       },
       "streamSettings": {
-        "network": "xhttp",
-        "xhttpSettings": {
-          "mode": "stream-one",
+        "network": "splithttp",
+        "splithttpSettings": {
           "host": "example.com",
           "path": "/xhttp"
         },
@@ -92,7 +91,7 @@
     },
 
     {
-      "port": 2053,
+      "port": 0,
       "protocol": "vless",
       "tag": "grpc-in",
       "settings": {

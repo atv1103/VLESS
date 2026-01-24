@@ -15,9 +15,9 @@ for i in "$@"; do
     USER_ID="user_${i//[^[:alnum:]_-]/}"
   fi
 
-  if [[ -d "${ROOT_DIR}/configs/xhttp/${USER_ID}" ]]; then
-    echo "xhttp USER ${i} QR code:"
-    qrencode -t ansiutf8 < ${ROOT_DIR}/configs/xhttp/${USER_ID}/${USER_ID}.txt
+  if [[ -d "${ROOT_DIR}/configs/splithttp/${USER_ID}" ]]; then
+    echo "splitHTTP USER ${i} QR code:"
+    qrencode -t ansiutf8 < ${ROOT_DIR}/configs/splithttp/${USER_ID}/${USER_ID}.txt
   else
     echo "USER ${i} is not active"
   fi
