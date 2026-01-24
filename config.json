@@ -121,6 +121,18 @@
   "outbounds": [
     {
       "protocol": "freedom",
+      "tag": "wg-out",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      },
+      "streamSettings": {
+        "sockopt": {
+          "mark": 100
+        }
+      }
+    },
+    {
+      "protocol": "freedom",
       "tag": "direct"
     },
     {
@@ -139,7 +151,12 @@
         "type": "field",
         "ip": ["geoip:private"],
         "outboundTag": "block"
-        }
+      },
+      {
+        "type": "field",
+        "inboundTag": ["reality-in", "ss-in", "splithttp-in", "grpc-in"],
+        "outboundTag": "wg-out"
+      }
     ],
     "domainStrategy": "IPIfNonMatch"
   }

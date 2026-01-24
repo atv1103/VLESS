@@ -7,8 +7,12 @@
 docker compose --profile setup run --rm wg-config-builder &&
 docker compose --profile setup down --rmi local`
 
-4. `nano ./wg/config/wg0.conf` - редактируем конфиг Wireguard
-5. `docker compose up -d` - запускаем контейнер с VLESS и WG
+4. `cp ./examples/wg0.conf ./wg/config/wg0.conf` - копируем конфиг Wireguard
+5. `nano ./wg/config/wg0.conf` - редактируем конфиг Wireguard
+6. `docker compose up -d wireguard && sleep 10 && docker compose up -d xray` - запускаем контейнер с VLESS и WG
+
+7. `docker exec xray curl ifconfig.me` - проверить IP Xray (должен быть IP WireGuard)
+8. `curl ifconfig.me` - проверить IP хоста (должен остаться ваш VPS IP)
 
 Готово, конфиги наших клиентов хранятся в директории **/configs/*прокси-протокол*/userНОМЕР/**, можем скопировать файл конфигурации клиента **userНОМЕР.txt** с сервера с помощью WinSCP или другим удобным для вас способом или вывести QR код прямо в терминале командой
 
@@ -46,6 +50,13 @@ net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
 
 и потом выполнить команду sysctl -p
+
+## Инструкции при изменении конфигов
+1. `docker compose restart xray` - при изменении конфига Xray (inbounds/outbounds)
+2. `docker compose restart wireguard && docker compose restart xray` - при изменении конфига WireGuard
+
+3. `docker exec xray curl ifconfig.me` - проверить IP Xray (должен быть IP WireGuard)
+4. `curl ifconfig.me` - проверить IP хоста (должен остаться ваш VPS IP)
 
 ## Описание settings.env файла
 **CLIENTS_QTY** - количество клиентов
