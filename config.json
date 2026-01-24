@@ -67,8 +67,7 @@
         "clients": [
           {
             "id": "UUID_КЛИЕНТА",
-            "email":"my user",
-            "flow": "xtls-rprx-vision"
+            "email":"my user"
           }
         ],
         "decryption": "none"
@@ -89,6 +88,33 @@
           "tls",
           "quic"
         ]
+      }
+    },
+
+    {
+      "port": 0,
+      "protocol": "vless",
+      "tag": "grpc-in",
+      "settings": {
+        "clients": [
+          {
+            "id": "UUID_КЛИЕНТА",
+            "email":"my user"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "grpc",
+        "grpcSettings": {
+          "serviceName": "имя_сервиса",
+          "multiMode": false
+        },
+        "security": "none"
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"]
       }
     }
   ],

@@ -10,6 +10,7 @@ source "$SCRIPT_DIR/_logger.sh"
 CONFIG_FILE="$ROOT_DIR/config.json"
 REALITY_CLIENTS_FILE="$ROOT_DIR/configs/reality_clients.json"
 xhttp_CLIENTS_FILE="$ROOT_DIR/configs/xhttp_clients.json"
+GRPC_CLIENTS_FILE="$ROOT_DIR/configs/grpc_clients.json"
 SS_CLIENTS_FILE="$ROOT_DIR/configs/shadowsocks_clients.json"
 SETTINGS_FILE="$ROOT_DIR/settings.env"
 
@@ -44,6 +45,8 @@ validate_settings() {
         "xhttp_PORT"
         "xhttp_HOST"
         "xhttp_PATH"
+        "GRPC_PORT"
+        "GRPC_SERVICENAME"
     )
 
     for var in "${required_vars[@]}"; do
@@ -65,10 +68,12 @@ log_info "Backup created: $BACKUP_FILE"
 log_info "Reading client data..."
 REALITY_CLIENTS=$(cat "$REALITY_CLIENTS_FILE")
 xhttp_CLIENTS=$(cat "$xhttp_CLIENTS_FILE" 2>/dev/null || echo "[]")
+GRPC_CLIENTS=$(cat "$GRPC_CLIENTS_FILE" 2>/dev/null || echo "[]")
 SS_CLIENTS=$(cat "$SS_CLIENTS_FILE" 2>/dev/null || echo "[]")
 
 log_info "Reality clients: $(echo "$REALITY_CLIENTS" | jq 'length') users"
 log_info "xhttp clients: $(echo "$xhttp_CLIENTS" | jq 'length') users"
+log_info "grpc clients: $(echo "$GRPC_CLIENTS" | jq 'length') users"
 log_info "Shadowsocks clients: $(echo "$SS_CLIENTS" | jq 'length') users"
 
 # Обновляем конфиг с помощью jq
@@ -76,6 +81,7 @@ log_info "Updating config.json..."
 
 jq --argjson reality_clients "$REALITY_CLIENTS" \
     --argjson xhttp_clients "$xhttp_CLIENTS" \
+    --argjson grpc_clients "$GRPC_CLIENTS" \
     --argjson ss_clients "$SS_CLIENTS" \
     --arg reality_port "$REALITY_PORT" \
     --arg reality_dest "$REALITY_DEST" \
@@ -89,6 +95,8 @@ jq --argjson reality_clients "$REALITY_CLIENTS" \
     --arg xhttp_port "$xhttp_PORT" \
     --arg xhttp_host "$xhttp_HOST" \
     --arg xhttp_path "$xhttp_PATH" \
+    --arg grpc_port "$GRPC_PORT" \
+    --arg grpc_serviceName "$GRPC_SERVICENAME" \
     '
     # Обновляем Reality (TCP) clients
     (.inbounds[] | select(.tag == "reality-in") | .settings.clients) = $reality_clients |
@@ -106,6 +114,13 @@ jq --argjson reality_clients "$REALITY_CLIENTS" \
     (.inbounds[] | select(.tag == "xhttp-h3-in") | .port) = ($xhttp_port | tonumber) |
     (.inbounds[] | select(.tag == "xhttp-h3-in") | .streamSettings.xhttpSettings.host) = $xhttp_host |
     (.inbounds[] | select(.tag == "xhttp-h3-in") | .streamSettings.xhttpSettings.path) = $xhttp_path |
+
+    # Обновляем grpc clients
+    (.inbounds[] | select(.tag == "grpc-in") | .settings.clients) = $xhttp_clients |
+
+    # Обновляем grpc настройки (тот же публичный ключ что и для Reality)
+    (.inbounds[] | select(.tag == "grpc-in") | .port) = ($grpc_port | tonumber) |
+    (.inbounds[] | select(.tag == "grpc-in") | .streamSettings.grpcSettings.serviceName) = $grpc_serviceName |
 
     # Обновляем Shadowsocks clients
     (.inbounds[] | select(.tag == "ss-in") | .settings.clients) = $ss_clients |

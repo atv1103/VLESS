@@ -226,6 +226,54 @@ generate_xhttp_configs() {
     log_info "xhttp configurations generated"
 }
 
+generate_grpc_configs() {
+    log_info "Generating grpc configurations..."
+
+    local clients_data_file="configs/reality_clients.json"
+
+    if [[ ! -f "$clients_data_file" ]]; then
+        log_error "Client data file not found. Run Reality generation first."
+        return 1
+    fi
+
+    local grpc_clients_json="["
+    local first=true
+
+    while IFS= read -r line; do
+        # Извлекаем поля из JSON объекта
+        local uuid=$(echo "$line" | jq -r '.id')
+        local email=$(echo "$line" | jq -r '.email')
+
+        # Добавляем в JSON
+        if [ "$first" = true ]; then
+            grpc_clients_json+="
+        {\"id\": \"$uuid\", \"email\": \"$email\"}"
+            first=false
+        else
+            grpc_clients_json+=",
+        {\"id\": \"$uuid\", \"email\": \"$email\"}"
+        fi
+
+        # Генерация vless:// ссылки для grpc
+        local grpc_link="vless://${uuid}@${SERVER_IP}:${GRPC_PORT:-443}?type=grpc&encryption=none&security=none&serviceName=${GRPC_SERVICENAME}#grpc_${email}"
+
+        # Сохранение
+        mkdir -p configs/grpc/${email}
+        echo "$grpc_link" > "configs/grpc/${email}/${email}.txt"
+        qrencode -t PNG -o "configs/grpc/${email}/${email}.png" -s 10 "$grpc_link"
+
+        log_info "Generated grpc config for $email"
+
+    done < <(jq -c '.[]' "$clients_data_file")
+
+    grpc_clients_json+="
+    ]"
+
+    echo "$grpc_clients_json" > configs/grpc_clients.json
+
+    log_info "grpc configurations generated"
+}
+
 main() {
     log_info "Starting configuration generation..."
 
@@ -234,6 +282,7 @@ main() {
     generate_reality_configs
     generate_shadowsocks_configs
     generate_xhttp_configs
+    generate_grpc_configs
 
     log_info "Configuration generation completed!"
 }

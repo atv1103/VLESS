@@ -18,6 +18,8 @@ docker compose --profile setup down --rmi local`
 
 `docker exec -it xray /etc/xray/show-xhttp userНОМЕР`
 
+`docker exec -it xray /etc/xray/show-grpc userНОМЕР`
+
 ## Рекомендуемые доп настройки
 1. Сделайте проброс порта не только на 443/TCP-порт (его делает XTLS-Reality), а еще на 443/UDP и 80/TCP до сервера, под который вы маскируетесь. Например, если вы маскируетесь под www.microsoft.com, то отрезолвте его IP-адрес (с помощью nslookup, ping или какого-нибудь онлайн-сервиса), а потом добавьте правила iptables (можно засунуть в /etc/rc.local, если он у вас есть - см. инструкции для вашего Linux-дистрибутива):
 
@@ -73,6 +75,10 @@ net.ipv4.tcp_congestion_control=bbr
 **xhttp_HOST** - доменное имя, которое будет использоваться в HTTP заголовке host
 
 **xhttp_PATH** - URI путь для соединения
+
+**GRPC_PORT** - рекомендовано 2053
+
+**GRPC_SERVICENAME** - необходимо изменить номер порта на нестандартный
 
 ## Config.json
 Чтобы не блокировался торрент, в **outbounds** необходимо удалить объект
