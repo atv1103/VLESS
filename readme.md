@@ -3,8 +3,8 @@
 2. `cd VLESS && bash prepare-system.sh` - доп настройки сервера
 3. Создаем пользовательские конфиги VLESS и клиентский конфиг Wireguard
 
-`docker compose --profile setup run --rm config-builder && \
-docker compose --profile setup run --rm wg-config-builder && \
+`docker compose --profile setup run --rm config-builder &&
+docker compose --profile setup run --rm wg-config-builder &&
 docker compose --profile setup down --rmi local`
 
 4. `nano ./wg/config/wg0.conf` - редактируем конфиг Wireguard
