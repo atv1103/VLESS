@@ -155,6 +155,10 @@ echo "xhttp clients:"
 jq '.inbounds[] | select(.tag == "xhttp-h3-in") | .settings.clients | length' "$CONFIG_FILE"
 
 echo ""
+echo "grpc clients:"
+jq '.inbounds[] | select(.tag == "grpc-in") | .settings.clients | length' "$CONFIG_FILE"
+
+echo ""
 echo "Shadowsocks clients:"
 jq '.inbounds[] | select(.tag == "ss-in") | .settings.clients | length' "$CONFIG_FILE"
 
