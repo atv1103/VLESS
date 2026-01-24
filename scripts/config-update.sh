@@ -116,7 +116,7 @@ jq --argjson reality_clients "$REALITY_CLIENTS" \
     (.inbounds[] | select(.tag == "splithttp-in") | .streamSettings.splithttpSettings.path) = $splithttp_path |
 
     # Обновляем grpc clients
-    (.inbounds[] | select(.tag == "grpc-in") | .settings.clients) = $xhttp_clients |
+    (.inbounds[] | select(.tag == "grpc-in") | .settings.clients) = $grpc_clients |
 
     # Обновляем grpc настройки (тот же публичный ключ что и для Reality)
     (.inbounds[] | select(.tag == "grpc-in") | .port) = ($grpc_port | tonumber) |
