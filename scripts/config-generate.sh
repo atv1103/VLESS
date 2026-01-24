@@ -80,20 +80,6 @@ generate_reality_keys() {
     fi
 }
 
-generate_ss_password() {
-    if [[ -z "$SS_SERVER_PASSWORD" ]]; then
-        log_info "Generating Shadowsocks server password..."
-        SS_SERVER_PASSWORD=$(openssl rand -base64 16)
-
-        # Обновляем settings.env
-        safe_sed "s|^SS_SERVER_PASSWORD=.*|SS_SERVER_PASSWORD=\"$SS_SERVER_PASSWORD\"|" "$ROOT_DIR/settings.env"
-
-        log_info "Shadowsocks password generated and saved to settings.env"
-    else
-        log_info "Using existing Shadowsocks password from settings.env"
-    fi
-}
-
 create_directories() {
     mkdir -p configs/reality
     mkdir -p configs/shadowsocks2022
@@ -152,12 +138,18 @@ generate_shadowsocks_configs() {
     local ss_clients_json="["
 
     local SERVER_PASSWORD
-    SERVER_PASSWORD=$(openssl rand -base64 16)
+    while :; do
+        SERVER_PASSWORD=$(openssl rand -base64 16)
+        [[ "$SERVER_PASSWORD" != *"/"* ]] && break
+    done
     safe_sed "s|^SS_SERVER_PASSWORD=.*|SS_SERVER_PASSWORD=\"$SERVER_PASSWORD\"|" "$ROOT_DIR/settings.env"
 
     for i in $(seq 1 "$CLIENTS_QTY"); do
         local client_password
-        client_password=$(openssl rand -base64 16)
+        while :; do
+            client_password=$(openssl rand -base64 16)
+            [[ "$client_password" != *"/"* ]] && break
+        done
         local email="user$i"
 
         if [ "$i" -lt "$CLIENTS_QTY" ]; then
@@ -238,7 +230,6 @@ main() {
     log_info "Starting configuration generation..."
 
     generate_reality_keys
-    generate_ss_password
     create_directories
     generate_reality_configs
     generate_shadowsocks_configs

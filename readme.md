@@ -7,9 +7,8 @@
 docker compose --profile setup run --rm wg-config-builder && \
 docker compose --profile setup down --rmi local```
 
-4. `cp ./examples/wg0.conf ./wg/config/wg0.conf` - копируем конфиг Wiregiard
-5. `nano ./wg/config/wg0.conf` - редактируем конфиг Wireguard
-6. `docker compose up -d` - запускаем контейнер с VLESS и WG
+4. `nano ./wg/config/wg0.conf` - редактируем конфиг Wireguard
+5. `docker compose up -d` - запускаем контейнер с VLESS и WG
 
 Готово, конфиги наших клиентов хранятся в директории **/configs/*прокси-протокол*/userНОМЕР/**, можем скопировать файл конфигурации клиента **userНОМЕР.txt** с сервера с помощью WinSCP или другим удобным для вас способом или вывести QR код прямо в терминале командой
 
