@@ -28,6 +28,7 @@ Table = off
 
 [Peer]
 PublicKey = <SERVER_PUBLIC_KEY>
+PresharedKey = <SERVER_PRESHARED_KEY>
 Endpoint = VPS_IP:51820
 AllowedIPs = 0.0.0.0/1, 128.0.0.0/1
 PersistentKeepalive = 25
