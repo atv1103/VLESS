@@ -21,7 +21,7 @@ echo "[wg-config] Writing wg0.conf..."
 cat > "$WG_CONF" <<EOF
 [Interface]
 Address = 10.100.0.2/32 # INTERNAL_SERVER_SUBNET/32 - но host ID уникальный! (<- .2)
-PrivateKey = $PRIVATE_KEY
+PrivateKey = <SERVER_PRIVATE_KEY>
 MTU = 1380
 # Таблица маршрутизации - не изменяет default route! задаем маршрут при запуске композа
 Table = off
