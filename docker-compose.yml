@@ -23,24 +23,21 @@ services:
       dockerfile: Dockerfile.xray
     container_name: xray
     restart: unless-stopped
-    network_mode: host  # Для доступа ко всем портам
     volumes:
       - ./:/etc/xray
     cap_add:
       - NET_ADMIN
     depends_on:
       - wireguard
-    entrypoint: /bin/bash
-    command: |
-      -c "
-      # Настройка маршрутов для отправки трафика через WireGuard
-      ip route add 172.20.0.0/24 dev eth0 || true
-      ip route add default via 172.20.0.2 table 100 || true
-      ip rule add fwmark 100 table 100 || true
-
-      # Запуск Xray
-      exec /usr/bin/xray run -config /etc/xray/config.json
-      "
+    ports:
+      - "443:443"
+      - "8388:8388"
+      - "8388:8388/udp"
+      - "1234:1234"
+      - "2053:2053"
+    networks:
+      xray-network:
+        ipv4_address: 172.20.0.3
 
   # Контейнер для генерации конфигурации (запускается один раз)
   wg-config-builder:

@@ -124,11 +124,6 @@
       "tag": "wg-out",
       "settings": {
         "domainStrategy": "UseIPv4"
-      },
-      "streamSettings": {
-        "sockopt": {
-          "mark": 100
-        }
       }
     },
     {

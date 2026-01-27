@@ -20,17 +20,24 @@ echo "[wg-config] Writing wg0.conf..."
 
 cat > "$WG_CONF" <<EOF
 [Interface]
-Address = 10.100.0.2/32 # INTERNAL_SERVER_SUBNET/32 - но host ID уникальный! (<- .2)
+Address = 10.100.0.2/32 # <SERVER [INTERFACE] ADDRESS>/32
 PrivateKey = <SERVER_PRIVATE_KEY>
 MTU = 1380
+DNS = 1.1.1.1, 8.8.8.8
 # Таблица маршрутизации - не изменяет default route! задаем маршрут при запуске композа
 Table = off
+
+PostUp = ip route add <SERVER_IP>/32 via 172.20.0.1 dev eth0 || true
+PostUp = ip route del default via 172.20.0.1 dev eth0 || true
+PostUp = ip route add default dev wg0
+PostDown = ip route del default dev wg0 || true
+PostDown = ip route add default via 172.20.0.1 dev eth0 || true
 
 [Peer]
 PublicKey = <SERVER_PUBLIC_KEY>
 PresharedKey = <SERVER_PRESHARED_KEY>
-Endpoint = VPS_IP:51820
-AllowedIPs = 0.0.0.0/1, 128.0.0.0/1
+Endpoint = <SERVER_IP>:51820
+AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25
 EOF
 
