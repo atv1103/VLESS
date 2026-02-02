@@ -1,0 +1,146 @@
+{
+  "log": {
+    "loglevel": "info"
+  },
+
+  "inbounds": [
+    {
+      "port": 443,
+      "protocol": "vless",
+      "tag": "reality-in",
+      "settings": {
+        "clients": [
+          {
+            "id": "UUID_КЛИЕНТА",
+            "email":"my user",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "ваш_маскировочный_домен:443",
+          "xver": 0,
+          "serverNames": [
+            "ваш_маскировочный_домен"
+          ],
+          "privateKey": "ваш_PRIVATE_KEY",
+          "shortIds": [""]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    },
+
+    {
+      "port": 54321,
+      "tag": "ss-in",
+      "protocol": "shadowsocks",
+      "settings": {
+        "method": "2022-blake3-aes-128-gcm",
+        "password": "qg4ka8Wk+Po0liGMByDDSg==",
+        "network": "tcp,udp",
+        "clients": [
+          {
+            "password": "{{ user psk }}",
+            "email": "my user"
+          }
+        ]
+      }
+    },
+
+    {
+      "port": 0,
+      "protocol": "vless",
+      "tag": "splithttp-in",
+      "settings": {
+        "clients": [
+          {
+            "id": "UUID_КЛИЕНТА",
+            "email":"my user"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "splithttp",
+        "splithttpSettings": {
+          "host": "example.com",
+          "path": "/xhttp"
+        },
+        "security": "none"
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    },
+
+    {
+      "port": 0,
+      "protocol": "vless",
+      "tag": "grpc-in",
+      "settings": {
+        "clients": [
+          {
+            "id": "UUID_КЛИЕНТА",
+            "email":"my user"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "grpc",
+        "grpcSettings": {
+          "serviceName": "имя_сервиса",
+          "multiMode": false
+        },
+        "security": "none"
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"]
+      }
+    }
+  ],
+
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "block"
+    }
+  ],
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "protocol": "bittorrent",
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "ip": ["geoip:private"],
+        "outboundTag": "block"
+      }
+    ],
+    "domainStrategy": "IPIfNonMatch"
+  }
+}

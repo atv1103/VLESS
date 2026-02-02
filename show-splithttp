@@ -1,0 +1,24 @@
+#!/bin/bash
+# shellcheck shell=bash
+
+if [[ ! $# -gt 0 ]]; then
+  echo "You need to specify which users to show"
+  exit 0
+fi
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+for i in "$@"; do
+  if [[ "${i}" =~ ^[0-9]+$ ]]; then
+    USER_ID="user${i}"
+  else
+    USER_ID="user_${i//[^[:alnum:]_-]/}"
+  fi
+
+  if [[ -d "${ROOT_DIR}/configs/splithttp/${USER_ID}" ]]; then
+    echo "splitHTTP USER ${i} QR code:"
+    qrencode -t ansiutf8 < ${ROOT_DIR}/configs/splithttp/${USER_ID}/${USER_ID}.txt
+  else
+    echo "USER ${i} is not active"
+  fi
+done

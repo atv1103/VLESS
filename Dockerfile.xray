@@ -1,0 +1,29 @@
+# ---------- stage 1: build qrencode ----------
+FROM alpine:3.19 AS builder
+
+RUN apk add --no-cache \
+    build-base \
+    autoconf \
+    automake \
+    libtool \
+    pkgconfig \
+    git \
+    libpng-dev
+
+RUN git clone https://github.com/fukuchi/libqrencode.git /tmp/libqrencode \
+    && cd /tmp/libqrencode \
+    && ./autogen.sh \
+    && ./configure \
+    && make \
+    && make install
+
+# ---------- stage 2: runtime ----------
+FROM teddysun/xray:26.1.18
+
+COPY --from=builder /usr/local/bin/qrencode /usr/local/bin/qrencode
+COPY --from=builder /usr/local/lib/libqrencode.so* /usr/local/lib/
+
+COPY --from=builder /usr/lib/libpng16.so* /usr/lib/
+COPY --from=builder /lib/libz.so* /lib/
+
+ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/lib:/lib
