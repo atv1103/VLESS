@@ -292,26 +292,44 @@ update_dockercompose_ports() {
 
   echo "[+] Обновляем порты в docker-compose.yml"
 
-  # Удаляем старый блок ports у wireguard
-  awk '
-    /^  wireguard:/ { in_wg=1 }
-    in_wg && /^    ports:/ { skip=1; next }
-    skip && /^      -/ { next }
-    skip && /^    [^ -]/ { skip=0 }
-    !skip { print }
+  awk -v REALITY_PORT="$REALITY_PORT" \
+    -v SS_PORT="$SS_PORT" \
+    -v SPLITHTTP_PORT="$SPLITHTTP_PORT" \
+    -v GRPC_PORT="$GRPC_PORT" '
+  {
+    print_line = 1
+    if ($0 ~ /^[[:space:]]*ports:/) {
+      # запоминаем количество пробелов в отступе
+      match($0, /^([[:space:]]*)/, m)
+      indent = m[1]
+      print indent "ports:"
+      print indent "  - \"" REALITY_PORT ":" REALITY_PORT "\""
+      print indent "  - \"" SS_PORT ":" SS_PORT "/tcp\""
+      print indent "  - \"" SS_PORT ":" SS_PORT "/udp\""
+      print indent "  - \"" SPLITHTTP_PORT ":" SPLITHTTP_PORT "\""
+      print indent "  - \"" GRPC_PORT ":" GRPC_PORT "\""
+      in_ports = 1
+      print_line = 0
+      next
+    }
+    if (in_ports) {
+      # проверяем, что строка имеет больший отступ чем блок ports
+      match($0, /^([[:space:]]*)/, m)
+      current_indent = m[1]
+      if (length(current_indent) <= length(indent) && $0 !~ /^[[:space:]]*$/) {
+        in_ports = 0
+      } else {
+        # пропускаем старую строку порта
+        print_line = 0
+        next
+      }
+    }
+    if (print_line) print
+  }
   ' "$COMPOSE_FILE" > "$COMPOSE_FILE.tmp"
 
   cat "$COMPOSE_FILE.tmp" > "$COMPOSE_FILE"
   rm -f "$COMPOSE_FILE.tmp"
-
-  # Вставляем новый ports-блок
-  sed -i "/^  wireguard:/a\\
-    ports:\\
-      - \"${REALITY_PORT}:${REALITY_PORT}\"\\
-      - \"${SS_PORT}:${SS_PORT}/tcp\"\\
-      - \"${SS_PORT}:${SS_PORT}/udp\"\\
-      - \"${SPLITHTTP_PORT}:${SPLITHTTP_PORT}\"\\
-      - \"${GRPC_PORT}:${GRPC_PORT}\"" "$COMPOSE_FILE"
 
   echo "✅ Порты успешно обновлены"
 }

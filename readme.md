@@ -1,29 +1,31 @@
 ## Инструкция для запуска
-1. Изменяем настройки файла **settings.env**, удали блокировку торрентов при необходимости из config.json (инструкция ниже)
-2. `cd VLESS && bash prepare-system.sh` - доп настройки сервера
+1. `cd VLESS && nano settings.env` - Изменяем настройки файла **settings.env**, удали блокировку торрентов при необходимости из config.json
+2. `bash prepare-system.sh` - доп настройки сервера
 3. Создаем пользовательские конфиги VLESS:
 
 `docker compose --profile setup run --rm config-builder && docker compose --profile setup down --rmi local`
 
 1. `cp ./examples/wg0.conf ./wg/config/wg0.conf && nano ./wg/config/wg0.conf` - редактируем конфиг Wireguard
-2. `bash add-iptables-rules.sh` - добавить правила iptables
-3. `docker compose up -d` - запускаем контейнер с VLESS и WG
+2. `docker compose up -d` - запускаем контейнер с VLESS и WG
+3. `bash add-iptables-rules.sh` - добавляем правила iptables
 
-4. `docker exec wg-client curl -s ifconfig.me` - проверить IP Wireguard
-5. `curl ifconfig.me` - проверить IP хоста (должен остаться ваш VPS IP)
+4. `docker exec wg-client curl -s ifconfig.me` - проверяем IP Wireguard
+5. `curl ifconfig.me` - проверяем IP хоста (должен остаться ваш VPS IP)
 6. `docker logs xray -f` - логи xray контейнера (выйти через ctrl+c)
 
 Готово, конфиги наших клиентов хранятся в директории **/configs/*прокси-протокол*/userНОМЕР/**, можем скопировать файл конфигурации клиента **userНОМЕР.txt** с сервера с помощью WinSCP или другим удобным для вас способом или вывести QR код прямо в терминале командой
 
 `docker exec -it xray /etc/xray/show-reality userНОМЕР`
 
-`docker exec -it xray /etc/xray/show-ss userНОМЕР` - **DEPRECATED!**
-
 `docker exec -it xray /etc/xray/show-splithttp userНОМЕР`
 
 `docker exec -it xray /etc/xray/show-grpc userНОМЕР`
 
+`docker exec -it xray /etc/xray/show-ss userНОМЕР` - **DEPRECATED!**
+
 ## Рекомендуемые доп настройки
+**Внимание: временами билдер багует и не записывает IP в файл settings.env, чинится удалением билдера, образов и имаджей. Команда для полной очистки докер файлов (`docker stop $(docker ps -aq) 2>/dev/null; docker rm -f $(docker ps -aq) 2>/dev/null; docker rmi -f $(docker images -aq) 2>/dev/null; docker volume rm -f $(docker volume ls -q) 2>/dev/null; docker network prune -f; docker buildx prune -af; docker builder prune -af; docker system prune -af --volumes`)** О баге известно, будет исправлен при возможности
+
 1. Можно настроить SSH прокси. SSH-сервер нужно перевесить на нестандартный порт (не 22).
 
    `sudo nano /etc/ssh/sshd_config` - #Port 22 закомментирован, раскомментируй и замени на нужный тебе, или добавь дополнительную строку ниже (например Port 1234), тогда будет два порта SSH.
