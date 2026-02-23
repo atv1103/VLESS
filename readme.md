@@ -120,7 +120,9 @@ net.ipv4.tcp_congestion_control=bbr
 
 # Клиенты
 Windows / Linux - v2rayN, Nekobox/Nekoray, Hiddify‑Next, InvisibleMan
+
 Android - v2rayNG, NekoboxForAndroid, Hiddify‑Next
+
 iOS / macOS - Shadowrocket, Streisand, FoXray, v2raytun
 
 Подробнее в статье https://habr.com/ru/articles/799751/

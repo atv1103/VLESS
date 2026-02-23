@@ -276,6 +276,7 @@ generate_grpc_configs() {
 
 update_dockercompose_ports() {
   local COMPOSE_FILE="${ROOT_DIR}/docker-compose.yml"
+  source "$ROOT_DIR/settings.env"
 
   if [[ ! -f "$COMPOSE_FILE" ]]; then
     echo "❌ docker-compose.yml не найден"
