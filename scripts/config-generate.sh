@@ -83,7 +83,7 @@ generate_reality_keys() {
 create_directories() {
     mkdir -p configs/reality
     mkdir -p configs/shadowsocks2022
-    mkdir -p configs/xhttp
+    mkdir -p configs/splithttp
     log_info "Directories created"
 }
 
